@@ -180,3 +180,52 @@ body { max-height: 560px; display: flex; flex-direction: column; }
 }
 .toast.show { opacity: 1; }
 .toast.hidden { display: none; }
+
+/* Bid-Details */
+.bid-section {
+  border-top: 1px solid var(--border);
+  padding: 8px 12px;
+  font-size: 12px;
+}
+.bid-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 10px;
+  padding: 4px 0;
+  align-items: center;
+}
+.bid-row + .bid-row {
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+.bid-user {
+  color: var(--text);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bid-perk {
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.bid-perk.low {
+  color: var(--green);
+}
+.bid-payout {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.bid-time {
+  color: var(--muted);
+  font-size: 11px;
+  text-align: right;
+  min-width: 55px;
+}
+.bids-badge.clickable {
+  cursor: pointer;
+}
+.bids-badge.clickable:hover {
+  opacity: 0.8;
+}

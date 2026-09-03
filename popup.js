@@ -154,7 +154,7 @@
       title.appendChild(proEl);
     }
     var bidBadge = document.createElement("span");
-    bidBadge.className = "bids-badge";
+    bidBadge.className = "bids-badge" + (bidCount ? " clickable" : "");
     bidBadge.textContent = bidCount + " Bid" + (bidCount === 1 ? "" : "s");
     head.appendChild(title);
     head.appendChild(bidBadge);
@@ -165,6 +165,34 @@
     grid.appendChild(cell("Min. Schaden", fmtDamage(a.minimumDamage), ["v", "value-high"]));
     grid.appendChild(cell("PerK", fmtPerK(a.currentPerK), ["v", "perk", "perk-high", (a.currentPerK <= a.initialPerK ? "low" : "")]));
     grid.appendChild(countdownCell(expiry));
+
+    var bidSection = null;
+    if (bidCount) {
+      bidSection = document.createElement("div");
+      bidSection.className = "bid-section hidden";
+      (a.bids || []).forEach(function (b) {
+        var row = document.createElement("div");
+        row.className = "bid-row";
+        var userName = document.createElement("span");
+        userName.className = "bid-user";
+        userName.textContent = b.user || b.mu || "Unbekannt";
+        row.appendChild(userName);
+        var perK = document.createElement("span");
+        perK.className = "bid-perk";
+        perK.textContent = fmtPerK(b.perK);
+        if (b.perK && a.initialPerK && b.perK <= a.initialPerK) perK.classList.add("low");
+        row.appendChild(perK);
+        var payout = document.createElement("span");
+        payout.className = "bid-payout";
+        payout.textContent = fmtMoney(b.payout);
+        row.appendChild(payout);
+        var time = document.createElement("span");
+        time.className = "bid-time";
+        time.textContent = b.bidAt ? timeAgo(b.bidAt) : "";
+        row.appendChild(time);
+        bidSection.appendChild(row);
+      });
+    }
 
     var actions = document.createElement("div");
     actions.className = "item-actions";
@@ -178,7 +206,14 @@
 
     li.appendChild(head);
     li.appendChild(grid);
+    if (bidSection) li.appendChild(bidSection);
     li.appendChild(actions);
+
+    if (bidCount) {
+      bidBadge.addEventListener("click", function () {
+        bidSection.classList.toggle("hidden");
+      });
+    }
     return li;
   }
 
@@ -237,6 +272,19 @@
   }
 
   function pad(n) { return String(n).padStart(2, "0"); }
+
+  function timeAgo(dateStr) {
+    var diff = Date.now() - new Date(dateStr).getTime();
+    if (diff < 0) return "gerade eben";
+    var s = Math.floor(diff / 1000);
+    if (s < 60) return "vor " + s + "s";
+    var m = Math.floor(s / 60);
+    if (m < 60) return "vor " + m + "Min.";
+    var h = Math.floor(m / 60);
+    if (h < 24) return "vor " + h + "Std.";
+    var d = Math.floor(h / 24);
+    return "vor " + d + "T.";
+  }
 
   function showLoading() {
     loadingEl.classList.remove("hidden");
