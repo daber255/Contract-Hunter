@@ -270,16 +270,19 @@
         setImportStatus("Prüfe ID " + (resolved + 1) + "/" + total + " …");
         return WE.getAllianceById(id).then(function (a) {
           if (a && Array.isArray(a.memberCountries)) {
-            a.memberCountries.forEach(function (c) {
-              if (allianceMembers.indexOf(c) === -1) allianceMembers.push(c);
+            a.memberCountries.forEach(function (m) {
+              var mid = (m && m.country) ? m.country : m;
+              if (allianceMembers.indexOf(mid) === -1) allianceMembers.push(mid);
             });
           } else {
             if (countryIds.indexOf(id) === -1) countryIds.push(id);
           }
           resolved++;
+          return waitTicks(d);
         }).catch(function () {
           if (countryIds.indexOf(id) === -1) countryIds.push(id);
           resolved++;
+          return waitTicks(d);
         });
       });
     });
@@ -289,6 +292,12 @@
         if (result.indexOf(mid) === -1) result.push(mid);
       });
       return result;
+    });
+  }
+
+  function waitTicks(ms) {
+    return new Promise(function (resolve) {
+      setTimeout(resolve, ms);
     });
   }
 
