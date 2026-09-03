@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "WarEra Contract Hunter",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Zeigt aktive Söldner-Contract-Auktionen aus WarEra an, filtert und sortiert sie und verlinkt zum Bieten im Spiel.",
   "permissions": ["storage", "alarms"],
   "host_permissions": ["https://api2.warera.io/*"],
