@@ -132,12 +132,27 @@
     title.className = "item-title";
     var oppId = WE.getOpponentCountry(a, battleMap);
     var scopeTag = a.roundNumber != null ? "Runde " + a.roundNumber : "Schlacht";
-    title.innerHTML =
-      (WE.countryName(a.forCountry) || "Unbekannt") +
-      ' <span class="side-tag ' + side + '">' + (side === "attacker" ? "Angreifer" : "Verteidiger") + "</span>" +
-      ' <span class="scope-tag">' + scopeTag + "</span>" +
-      ' <span class="opponent-tag">vs. ' + (WE.countryName(oppId) || "?") + "</span>" +
-      (a.professionalsOnly ? ' <span class="bids-badge">Pro</span>' : "");
+    var titleName = document.createElement("span");
+    titleName.textContent = WE.countryName(a.forCountry) || "Unbekannt";
+    title.appendChild(titleName);
+    var sideEl = document.createElement("span");
+    sideEl.className = "side-tag " + side;
+    sideEl.textContent = side === "attacker" ? "Angreifer" : "Verteidiger";
+    title.appendChild(sideEl);
+    var scopeEl = document.createElement("span");
+    scopeEl.className = "scope-tag";
+    scopeEl.textContent = scopeTag;
+    title.appendChild(scopeEl);
+    var oppEl = document.createElement("span");
+    oppEl.className = "opponent-tag";
+    oppEl.textContent = "vs. " + (WE.countryName(oppId) || "?");
+    title.appendChild(oppEl);
+    if (a.professionalsOnly) {
+      var proEl = document.createElement("span");
+      proEl.className = "bids-badge";
+      proEl.textContent = "Pro";
+      title.appendChild(proEl);
+    }
     var bidBadge = document.createElement("span");
     bidBadge.className = "bids-badge";
     bidBadge.textContent = bidCount + " Bid" + (bidCount === 1 ? "" : "s");
@@ -146,9 +161,9 @@
 
     var grid = document.createElement("div");
     grid.className = "item-grid";
-    grid.appendChild(cell("Budget", '<span class="budget v">' + fmtMoney(a.budget) + "</span>"));
-    grid.appendChild(cell("Min. Schaden", '<span class="v value-high">' + fmtDamage(a.minimumDamage) + "</span>"));
-    grid.appendChild(cell("PerK", '<span class="v perk perk-high ' + (a.currentPerK <= a.initialPerK ? "low" : "") + '">' + fmtPerK(a.currentPerK) + "</span>"));
+    grid.appendChild(cell("Budget", fmtMoney(a.budget), ["v", "budget"]));
+    grid.appendChild(cell("Min. Schaden", fmtDamage(a.minimumDamage), ["v", "value-high"]));
+    grid.appendChild(cell("PerK", fmtPerK(a.currentPerK), ["v", "perk", "perk-high", (a.currentPerK <= a.initialPerK ? "low" : "")]));
     grid.appendChild(countdownCell(expiry));
 
     var actions = document.createElement("div");
@@ -167,7 +182,7 @@
     return li;
   }
 
-  function cell(k, v) {
+  function cell(k, v, classes) {
     var div = document.createElement("div");
     div.className = "grid-cell";
     var kEl = document.createElement("span");
@@ -175,7 +190,10 @@
     kEl.textContent = k;
     div.appendChild(kEl);
     var vEl = document.createElement("span");
-    vEl.innerHTML = String(v);
+    (Array.isArray(classes) ? classes : []).forEach(function (c) {
+      if (c) vEl.classList.add(c);
+    });
+    vEl.textContent = String(v);
     div.appendChild(vEl);
     return div;
   }
