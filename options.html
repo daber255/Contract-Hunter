@@ -225,6 +225,19 @@
         <div id="allianceStatus" class="mini-status"></div>
         <div class="alliance-grid" id="allianceList"></div>
       </div>
+
+      <div class="alliance-section">
+        <h2 class="h2">Import aus Datei</h2>
+        <p class="desc">
+          JSON- oder TXT-Datei mit <strong>Country-IDs</strong> und/oder <strong>Alliance-IDs</strong> hochladen.
+          Ersetzt die aktuelle No-Hit-Liste vollständig.
+        </p>
+        <div class="row">
+          <input type="file" id="noHitImport" accept=".json,.txt" style="display:none">
+          <button id="importBtn" class="secondary">Datei auswählen</button>
+          <span id="importStatus" class="mini-status"></span>
+        </div>
+      </div>
     </div>
   </div>
 

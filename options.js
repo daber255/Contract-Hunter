@@ -19,6 +19,11 @@
   var allianceStatus = document.getElementById("allianceStatus");
   var allianceList = document.getElementById("allianceList");
 
+  // Import
+  var noHitImport = document.getElementById("noHitImport");
+  var importBtn = document.getElementById("importBtn");
+  var importStatusEl = document.getElementById("importStatus");
+
   var allCountries = [];       // { _id, name, code }
   var noHit = [];              // [] of country _id
   var mapIdToCountry = {};
@@ -216,6 +221,108 @@
     });
   }
 
+  // ---------- Import aus Datei ----------
+  function setImportStatus(text, type) {
+    importStatusEl.textContent = text;
+    importStatusEl.className = type || "";
+  }
+
+  function parseIdsFromText(text) {
+    var allianceIds = [];
+    var countryIds = [];
+    var lines = text.split(/[\r\n]+/);
+    lines.forEach(function (line) {
+      var id = line.trim();
+      if (!id || id.length < 10) return;
+      if (id.charAt(0) === "{" || id.charAt(0) === "[") return;
+      if (/^[0-9a-f]{24}$/i.test(id)) {
+        countryIds.push(id);
+      }
+    });
+    return { allianceIds: allianceIds, countryIds: countryIds };
+  }
+
+  function parseImportFile(text) {
+    var trimmed = text.trim();
+    if (trimmed.charAt(0) === "{") {
+      try {
+        var obj = JSON.parse(trimmed);
+        return {
+          allianceIds: Array.isArray(obj.allianceIds) ? obj.allianceIds : [],
+          countryIds: Array.isArray(obj.countryIds) ? obj.countryIds : []
+        };
+      } catch (e) {
+        return null;
+      }
+    }
+    return parseIdsFromText(text);
+  }
+
+  function resolveAllianceMembers(allianceIds, delay) {
+    var d = delay || 260;
+    var allMemberIds = [];
+    var chain = Promise.resolve();
+    var total = allianceIds.length;
+    var resolved = 0;
+    allianceIds.forEach(function (aid) {
+      chain = chain.then(function () {
+        setImportStatus("Löse Allianz " + (resolved + 1) + "/" + total + " auf …");
+        return WE.getAllianceById(aid).then(function (a) {
+          if (a && Array.isArray(a.memberCountries)) {
+            a.memberCountries.forEach(function (c) {
+              if (allMemberIds.indexOf(c) === -1) allMemberIds.push(c);
+            });
+          }
+          resolved++;
+        }).catch(function () {
+          resolved++;
+        });
+      });
+    });
+    return chain.then(function () { return allMemberIds; });
+  }
+
+  function handleImport() {
+    var file = noHitImport.files[0];
+    if (!file) return;
+    setImportStatus("Lese Datei …");
+    var reader = new FileReader();
+    reader.onload = function (ev) {
+      var parsed = parseImportFile(ev.target.result);
+      if (!parsed) {
+        setImportStatus("Fehler: Ungültiges Dateiformat.", "error");
+        return;
+      }
+      var ids = (parsed.countryIds || []).slice();
+      var allianceIds = parsed.allianceIds || [];
+      if (!ids.length && !allianceIds.length) {
+        setImportStatus("Fehler: Keine gültigen IDs gefunden.", "error");
+        return;
+      }
+      if (allianceIds.length) {
+        resolveAllianceMembers(allianceIds, 260).then(function (memberIds) {
+          memberIds.forEach(function (mid) {
+            if (ids.indexOf(mid) === -1) ids.push(mid);
+          });
+          noHit = ids;
+          persistNoHit();
+          setNames();
+          markAllianceButtons();
+          setImportStatus(ids.length + " Länder importiert (ersetzt).", "ok");
+          noHitImport.value = "";
+        });
+      } else {
+        noHit = ids;
+        persistNoHit();
+        setNames();
+        markAllianceButtons();
+        setImportStatus(ids.length + " Länder importiert (ersetzt).", "ok");
+        noHitImport.value = "";
+      }
+    };
+    reader.readAsText(file);
+  }
+
   // ---------- Init ----------
   function init() {
     loadToken();
@@ -239,6 +346,8 @@
     setNames();
     markAllianceButtons();
   });
+  importBtn.addEventListener("click", function () { noHitImport.click(); });
+  noHitImport.addEventListener("change", handleImport);
 
   init();
 })();
