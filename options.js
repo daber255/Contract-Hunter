@@ -258,28 +258,38 @@
     return parseIdsFromText(text);
   }
 
-  function resolveAllianceMembers(allianceIds, delay) {
+  function probeAndResolve(allIds, delay) {
     var d = delay || 260;
-    var allMemberIds = [];
+    var countryIds = [];
+    var allianceMembers = [];
     var chain = Promise.resolve();
-    var total = allianceIds.length;
+    var total = allIds.length;
     var resolved = 0;
-    allianceIds.forEach(function (aid) {
+    allIds.forEach(function (id) {
       chain = chain.then(function () {
-        setImportStatus("Löse Allianz " + (resolved + 1) + "/" + total + " auf …");
-        return WE.getAllianceById(aid).then(function (a) {
+        setImportStatus("Prüfe ID " + (resolved + 1) + "/" + total + " …");
+        return WE.getAllianceById(id).then(function (a) {
           if (a && Array.isArray(a.memberCountries)) {
             a.memberCountries.forEach(function (c) {
-              if (allMemberIds.indexOf(c) === -1) allMemberIds.push(c);
+              if (allianceMembers.indexOf(c) === -1) allianceMembers.push(c);
             });
+          } else {
+            if (countryIds.indexOf(id) === -1) countryIds.push(id);
           }
           resolved++;
         }).catch(function () {
+          if (countryIds.indexOf(id) === -1) countryIds.push(id);
           resolved++;
         });
       });
     });
-    return chain.then(function () { return allMemberIds; });
+    return chain.then(function () {
+      var result = countryIds.slice();
+      allianceMembers.forEach(function (mid) {
+        if (result.indexOf(mid) === -1) result.push(mid);
+      });
+      return result;
+    });
   }
 
   function handleImport() {
@@ -293,32 +303,25 @@
         setImportStatus("Fehler: Ungültiges Dateiformat.", "error");
         return;
       }
-      var ids = (parsed.countryIds || []).slice();
-      var allianceIds = parsed.allianceIds || [];
-      if (!ids.length && !allianceIds.length) {
+      var allIds = [];
+      (parsed.allianceIds || []).forEach(function (id) {
+        if (allIds.indexOf(id) === -1) allIds.push(id);
+      });
+      (parsed.countryIds || []).forEach(function (id) {
+        if (allIds.indexOf(id) === -1) allIds.push(id);
+      });
+      if (!allIds.length) {
         setImportStatus("Fehler: Keine gültigen IDs gefunden.", "error");
         return;
       }
-      if (allianceIds.length) {
-        resolveAllianceMembers(allianceIds, 260).then(function (memberIds) {
-          memberIds.forEach(function (mid) {
-            if (ids.indexOf(mid) === -1) ids.push(mid);
-          });
-          noHit = ids;
-          persistNoHit();
-          setNames();
-          markAllianceButtons();
-          setImportStatus(ids.length + " Länder importiert (ersetzt).", "ok");
-          noHitImport.value = "";
-        });
-      } else {
-        noHit = ids;
+      probeAndResolve(allIds, 260).then(function (countryIds) {
+        noHit = countryIds;
         persistNoHit();
         setNames();
         markAllianceButtons();
-        setImportStatus(ids.length + " Länder importiert (ersetzt).", "ok");
+        setImportStatus(countryIds.length + " Länder importiert (ersetzt).", "ok");
         noHitImport.value = "";
-      }
+      });
     };
     reader.readAsText(file);
   }
