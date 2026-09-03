@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>WarEra Contract Hunter – Einstellungen</title>
+  <style>
+    :root {
+      --bg: #0f1620;
+      --panel: #182230;
+      --panel-2: #1f2d3d;
+      --border: #2b3b4f;
+      --text: #e6edf3;
+      --muted: #8aa0b3;
+      --accent: #4ea1ff;
+      --accent-2: #2f81f7;
+      --error: #ff6b6b;
+      --ok: #3fb68c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .wrap {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    h1 {
+      font-size: 22px;
+      margin: 0 0 6px;
+    }
+    .h2 {
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0 0 6px;
+    }
+    p.sub {
+      color: var(--muted);
+      margin: 0 0 28px;
+      font-size: 14px;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .card + .card { margin-bottom: 0; }
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    input[type="password"],
+    input[type="text"],
+    select.search {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+    }
+    input[type="text"],
+    select.search {
+      font-family: inherit;
+    }
+    input[type="password"] { font-family: ui-monospace, monospace; }
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .row { margin-bottom: 18px; }
+    .actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    button {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--accent-2);
+      color: #fff;
+    }
+    button.secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    button:hover { filter: brightness(1.08); }
+    #status {
+      font-size: 14px;
+      font-weight: 600;
+      min-height: 20px;
+    }
+    #status.ok { color: var(--ok); }
+    #status.error { color: var(--error); }
+    .hint {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    a { color: var(--accent); }
+    .desc {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+      margin: 0 0 16px;
+    }
+    .chip-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 5px 6px 5px 12px;
+      font-size: 13px;
+    }
+    .chip .x {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 14px;
+      padding: 0 2px;
+      line-height: 1;
+    }
+    .chip .x:hover { color: var(--error); }
+    .empty-note { color: var(--muted); font-size: 13px; margin-top: 14px; }
+    .alliance-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; margin-top: 4px; }
+    .alliance-btn {
+      text-align: left;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--panel-2);
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .alliance-btn:hover { border-color: var(--accent); }
+    .alliance-btn .cnt { color: var(--muted); font-weight: 400; }
+    .alliance-section { margin-top: 22px; }
+    .mini-status { color: var(--muted); font-size: 13px; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>WarEra Contract Hunter</h1>
+    <p class="sub">API-Token eingeben, um Contracts aus der WarEra-API zu laden.</p>
+
+    <div class="card">
+      <div class="row">
+        <label for="token">WarEra API-Token</label>
+        <input type="password" id="token" placeholder="wae_..." autocomplete="off" spellcheck="false">
+        <div class="hint">
+          Token im Spiel erzeugen unter <strong>Profil → Einstellungen → Create Token</strong>.
+          Er wird nur lokal in diesem Browser gespeichert.<br>
+          <a href="https://warera.io" target="_blank" rel="noopener">warera.io</a>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="save">Speichern</button>
+        <button id="test" class="secondary">Token testen</button>
+        <span id="status"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="h2">Automatische Aktualisierung</h2>
+      <p class="desc">Wie oft die Contract-Liste und die Icon-Anzeige automatisch aktualisiert werden.</p>
+      <div class="row">
+        <label for="refreshInterval">Update-Intervall</label>
+        <select id="refreshInterval" class="search">
+          <option value="5">5 Sekunden</option>
+          <option value="10">10 Sekunden</option>
+          <option value="15">15 Sekunden</option>
+          <option value="20" selected>20 Sekunden</option>
+          <option value="30">30 Sekunden</option>
+          <option value="45">45 Sekunden</option>
+          <option value="60">60 Sekunden</option>
+        </select>
+      </div>
+      <div class="actions">
+        <button id="saveInterval">Speichern</button>
+        <span id="intervalStatus" class="mini-status"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="h2">No-Hit-Länder</h2>
+      <p class="desc">
+        Contracts, deren <strong>Gegner-Land</strong> (die Seite, gegen die gekämpft wird) in dieser
+        Liste steht, werden im Popup ausgeblendet. Länder einzeln hinzufügen oder ganze Allianzen
+        anklicken, um alle Mitgliedsländer zu übernehmen.
+      </p>
+
+      <div class="row">
+        <label for="countrySearch">Land hinzufügen</label>
+        <select id="countrySearch" class="search">
+          <option value="">— Länder werden geladen … —</option>
+        </select>
+      </div>
+
+      <div class="chip-list" id="noHitChips"></div>
+      <div class="actions" style="margin-top:10px">
+        <button id="clearNoHit" class="secondary">Alle entfernen</button>
+        <span id="noHitCount" class="mini-status"></span>
+      </div>
+      <div class="empty-note" id="noHitEmpty">Noch keine No-Hit-Länder.</div>
+
+      <div class="alliance-section">
+        <h2 class="h2">Allianzen</h2>
+        <p class="desc">Klick auf eine Allianz fügt alle zugehörigen Länder zur No-Hit-Liste hinzu.</p>
+        <div id="allianceStatus" class="mini-status"></div>
+        <div class="alliance-grid" id="allianceList"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="api.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>

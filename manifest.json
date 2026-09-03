@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "WarEra Contract Hunter",
+  "version": "1.0.0",
+  "description": "Zeigt aktive Söldner-Contract-Auktionen aus WarEra an, filtert und sortiert sie und verlinkt zum Bieten im Spiel.",
+  "permissions": ["storage", "alarms"],
+  "host_permissions": ["https://api2.warera.io/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "WarEra Contract Hunter",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "options_page": "options.html",
+  "web_accessible_resources": [
+    {
+      "resources": ["notification-sound.mp3"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

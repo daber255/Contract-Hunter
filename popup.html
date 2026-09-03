@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>WarEra Contract Hunter</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <span class="logo">⚔️</span>
+      <h1>Contract Hunter</h1>
+    </div>
+    <div class="top-actions">
+      <button id="refresh" class="icon-btn" title="Aktualisieren">⟳</button>
+      <button id="settings" class="icon-btn" title="Einstellungen">⚙</button>
+    </div>
+  </header>
+
+  <div id="tokenNotice" class="notice hidden">
+    <p>Kein API-Token hinterlegt.</p>
+    <button id="openOptions">Token eingeben</button>
+  </div>
+
+  <div id="controls" class="controls hidden">
+    <div class="filters">
+      <label>
+        Land
+        <select id="filterCountry"><option value="">Alle</option></select>
+      </label>
+      <label>
+        Seite
+        <select id="filterSide">
+          <option value="">Alle</option>
+          <option value="attacker">Angreifer</option>
+          <option value="defender">Verteidiger</option>
+        </select>
+      </label>
+      <label class="check">
+        <input type="checkbox" id="filterProOnly">
+        Nur für Profis
+      </label>
+      <label class="check" title="Blendet Contracts aus, deren Gegner-Land auf deiner No-Hit-Liste steht">
+        <input type="checkbox" id="filterNoHit" checked>
+        No-Hit-Filter
+      </label>
+    </div>
+    <div class="sort">
+      <label>
+        Sortieren nach
+        <select id="sortBy">
+          <option value="score">Empfehlung</option>
+          <option value="budget">Budget</option>
+          <option value="perK">PerK (niedrig)</option>
+          <option value="expires">Endet bald</option>
+          <option value="payout">Auszahlung</option>
+        </select>
+      </label>
+    </div>
+  </div>
+
+  <main id="content" class="content">
+    <div id="loading" class="state"><div class="spinner"></div><span>Lade Contracts ...</span></div>
+    <div id="error" class="state hidden"></div>
+    <ul id="list" class="list hidden"></ul>
+  </main>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <footer class="foot">
+    <span id="meta"></span>
+    <span id="countdown" class="foot-countdown"></span>
+  </footer>
+
+  <script src="api.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

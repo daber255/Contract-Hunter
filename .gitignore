@@ -1,0 +1,17 @@
+# Secrets – niemals committen
+*.token
+.env
+.env.*
+.pat
+*github_pat*
+
+# Temporäre/Systemdateien
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
